@@ -13,14 +13,12 @@ genericCommands.getInfoContent = () => {
       iconURL: "https://avatars.githubusercontent.com/u/7419213",
       url: "https://github.com/dm94",
     })
-    .setDescription(
-      pjson.description);
+    .setDescription(pjson.description);
   return message;
 };
 
 genericCommands.getHelpContent = (commands) => {
-  let text =
-    "Now we work with slash commands type in chat / and you will start to see all the options \n \n";
+  let text = "Commands: \n \n";
 
   commands.forEach((command) => {
     if (command.name && command.description) {
