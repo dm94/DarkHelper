@@ -6,6 +6,8 @@
   "dependencies": {
     "discord.js": "^14.0.3",
     "dotenv": "^16.0.0",
+    "mongodb": "^5.4.0",
+    "node-nlp": "^4.27.0",
     "winston": "^3.3.3"
   },
   "engines": {
@@ -18,10 +20,7 @@
   "author": "Dm94Dani",
   "license": "MIT",
   "devDependencies": {
-    "@tensorflow-models/knn-classifier": "^1.2.4",
-    "@tensorflow/tfjs": "^4.6.0",
     "eslint": "^8.33.0",
-    "prettier": "^2.8.3",
-    "mongodb": "^5.4.0"
+    "prettier": "^2.8.3"
   }
 }
