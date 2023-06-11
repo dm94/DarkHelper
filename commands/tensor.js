@@ -68,7 +68,7 @@ tensorCommands.reloadModel = async (interaction) => {
 };
 
 tensorCommands.answerTheQuestion = async (interaction) => {
-  await interaction.deferReply({ ephemeral: true });
+  await interaction.deferReply({ ephemeral: false });
 
   if (!modelLoaded) {
     await loadModel();
@@ -123,7 +123,7 @@ tensorCommands.addQuestion = async (interaction) => {
     await interaction
       .editReply({
         content: "Error adding question",
-        ephemeral: false,
+        ephemeral: true,
       })
       .catch((error) => logger.error(error));
   } finally {
