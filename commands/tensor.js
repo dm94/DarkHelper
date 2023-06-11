@@ -25,6 +25,11 @@ async function getData() {
     data = await collection
       .find({}, { projection: { _id: 0, question: 1, answer: 1, language: 1 } })
       .toArray();
+    const extraCollection = client.db("dark").collection("extraquestions");
+    const extra = await extraCollection
+        .find({}, { projection: { _id: 0, question: 1, answer: 1, language: 1 } })
+        .toArray();
+    data = data.concat(extra);
     console.info(new Date().toLocaleTimeString(), "Data: Loaded from DB");
   } finally {
     await client.close();
@@ -106,18 +111,33 @@ tensorCommands.addQuestion = async (interaction) => {
 
   try {
     await client.connect();
-    const collection = client.db("dark").collection("questions");
-    await collection.insertOne({
-      language: language,
-      question: question,
-      answer: answer,
-    });
-    await interaction
-      .editReply({
-        content: "Question added",
-        ephemeral: true,
-      })
-      .catch((error) => logger.error(error));
+    if (interaction?.member?.id && interaction.member.id === process.env.DISCORD_OWNER_ID) {
+      const collection = client.db("dark").collection("questions");
+      await collection.insertOne({
+        language: language,
+        question: question,
+        answer: answer,
+      });
+      await interaction
+        .editReply({
+          content: "Question added",
+          ephemeral: true,
+        })
+        .catch((error) => logger.error(error));
+    } else {
+      const collection = client.db("dark").collection("extraquestions");
+      await collection.insertOne({
+        language: language,
+        question: question,
+        answer: answer,
+      });
+      await interaction
+        .editReply({
+          content: "Extra Question added",
+          ephemeral: true,
+        })
+        .catch((error) => logger.error(error));
+    }
   } catch (err) {
     console.log(err);
     await interaction
