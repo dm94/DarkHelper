@@ -21,6 +21,14 @@ controller.router = async (interaction) => {
           "You do not have permissions to use this command"
         );
       }
+    } else if (interaction.commandName === "reload") {
+      if (await controller.hasPermissions(interaction)) {
+        await tensorCommands.reloadModel(interaction);
+      } else {
+        await interaction.reply(
+          "You do not have permissions to use this command"
+        );
+      }
     } else {
       await interaction.reply("I don't know this command");
     }
