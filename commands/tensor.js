@@ -127,6 +127,7 @@ tensorCommands.addQuestion = async (interaction) => {
     } else {
       const collection = client.db("dark").collection("extraquestions");
       await collection.insertOne({
+        guilid: interaction.guildId,
         language: language,
         question: question,
         answer: answer,

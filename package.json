@@ -1,6 +1,6 @@
 {
   "name": "dark-helper",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Discord Bot with AI to help you with your plugin problems",
   "main": "index.js",
   "dependencies": {
