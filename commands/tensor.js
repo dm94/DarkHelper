@@ -27,8 +27,8 @@ async function getData() {
       .toArray();
     const extraCollection = client.db("dark").collection("extraquestions");
     const extra = await extraCollection
-        .find({}, { projection: { _id: 0, question: 1, answer: 1, language: 1 } })
-        .toArray();
+      .find({}, { projection: { _id: 0, question: 1, answer: 1, language: 1 } })
+      .toArray();
     data = data.concat(extra);
     console.info(new Date().toLocaleTimeString(), "Data: Loaded from DB");
   } finally {
@@ -97,12 +97,17 @@ tensorCommands.answerTheQuestion = async (interaction) => {
 
 tensorCommands.answerMessage = async (message, language) => {
   const response = await manager.process(language, message);
+
   if (response.answer) {
     return response.answer;
   }
 
+  if (response.intent && response.intent != "None") {
+    return response.intent;
+  }
+
   return null;
-}
+};
 
 tensorCommands.addQuestion = async (interaction) => {
   await interaction.deferReply({ ephemeral: true });
@@ -120,7 +125,10 @@ tensorCommands.addQuestion = async (interaction) => {
 
   try {
     await client.connect();
-    if (interaction?.member?.id && interaction.member.id === process.env.DISCORD_OWNER_ID) {
+    if (
+      interaction?.member?.id &&
+      interaction.member.id === process.env.DISCORD_OWNER_ID
+    ) {
       const collection = client.db("dark").collection("questions");
       await collection.insertOne({
         language: language,

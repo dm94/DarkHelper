@@ -1,5 +1,10 @@
 require("dotenv").config();
-const { Client, GatewayIntentBits, InteractionType } = require("discord.js");
+const {
+  Client,
+  GatewayIntentBits,
+  InteractionType,
+  Partials,
+} = require("discord.js");
 const genericCommands = require("./commands/generic");
 const slashCommandsRegister = require("./slashCommandsRegister");
 const logger = require("./helpers/logger");
@@ -10,7 +15,12 @@ const commandController = require("./commands/interaction_types/command");
 const tensorCommands = require("./commands/tensor");
 
 const client = new Client({
-  intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages],
+  intents: [
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.MessageContent,
+  ],
+  partials: [Partials.Channel],
 });
 
 client.on("ready", () => {
@@ -20,7 +30,6 @@ client.on("ready", () => {
 client.login(process.env.DISCORD_TOKEN);
 
 client.on("ready", () => {
-
   if (process.env.APP_DEV) {
     logger.info("Dev Mode");
     client.guilds.cache.forEach((guild) => {
@@ -54,10 +63,19 @@ client.on("interactionCreate", async (interaction) => {
 
 client.on("messageCreate", async (msg) => {
   try {
+    if (msg.author.bot) {
+      return;
+    }
+
     if (msg.content) {
       const response = await tensorCommands.answerMessage(msg.content, "en");
       if (response) {
         msg.reply(response);
+      } else {
+        const res = await tensorCommands.answerMessage(msg.content, "es");
+        if (res) {
+          msg.reply(res);
+        }
       }
     }
   } catch (e) {
