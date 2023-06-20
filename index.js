@@ -7,6 +7,7 @@ const logger = require("./helpers/logger");
 const autocompleteController = require("./commands/interaction_types/autocomplete");
 const buttonController = require("./commands/interaction_types/button");
 const commandController = require("./commands/interaction_types/command");
+const tensorCommands = require("./commands/tensor");
 
 const client = new Client({
   intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages],
@@ -44,6 +45,19 @@ client.on("interactionCreate", async (interaction) => {
         );
       } else {
         await commandController.router(interaction, client);
+      }
+    }
+  } catch (e) {
+    logger.error(e);
+  }
+});
+
+client.on("messageCreate", async (msg) => {
+  try {
+    if (msg.content) {
+      const response = await tensorCommands.answerMessage(msg.content, "en");
+      if (response) {
+        msg.reply(response);
       }
     }
   } catch (e) {

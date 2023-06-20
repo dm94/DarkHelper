@@ -95,6 +95,15 @@ tensorCommands.answerTheQuestion = async (interaction) => {
     .catch((error) => logger.error(error));
 };
 
+tensorCommands.answerMessage = async (message, language) => {
+  const response = await manager.process(language, message);
+  if (response.answer) {
+    return response.answer;
+  }
+
+  return null;
+}
+
 tensorCommands.addQuestion = async (interaction) => {
   await interaction.deferReply({ ephemeral: true });
 
