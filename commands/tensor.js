@@ -1,6 +1,9 @@
 const tensorCommands = {};
 
-const { NlpManager } = require("node-nlp");
+const { NormalizerEs, StemmerEs, StopwordsEs } = require("@nlpjs/lang-es");
+const { NormalizerEn, StemmerEn, StopwordsEn } = require("@nlpjs/lang-en");
+const { dockStart } = require("@nlpjs/basic");
+
 const { MongoClient, ServerApiVersion } = require("mongodb");
 const logger = require("../helpers/logger");
 
@@ -14,7 +17,33 @@ const client = new MongoClient(uri, {
   },
 });
 
-const manager = new NlpManager({ languages: ["es", "en"] });
+const normalizerEs = new NormalizerEs();
+const normalizerEn = new NormalizerEn();
+
+const stemmerEs = new StemmerEs();
+stemmerEs.stopwords = new StopwordsEs();
+
+const stemmerEn = new StemmerEn();
+stemmerEn.stopwords = new StopwordsEn();
+
+let nlp = null;
+
+(async () => {
+  const dock = await dockStart({
+    settings: {
+      nlp: {
+        forceNER: true,
+        languages: ["en", "es"],
+      },
+    },
+    use: ["Nlp", "Basic", "LangEn", "LangEs"],
+  });
+  nlp = dock.get("nlp");
+  nlp.addLanguage("es");
+  nlp.addLanguage("en");
+  await loadModel();
+})();
+
 let modelLoaded = false;
 
 async function getData() {
@@ -42,9 +71,26 @@ const addModel = async (trainingData) => {
   console.info(new Date().toLocaleTimeString(), "AI Logic: Model loading");
   try {
     trainingData.forEach((data) => {
-      manager.addDocument(data.language ?? "es", data.question, data.answer);
+      if (!data.question || !data.answer) {
+        return;
+      }
+
+      const language = data.language ?? "es";
+      let formatted = data.answer;
+
+      if (language === "es") {
+        const tokens = stemmerEs.tokenizeAndStem(data.answer, false);
+        formatted = tokens.join(".").toLowerCase();
+      } else if (language === "en") {
+        const tokens = stemmerEn.tokenizeAndStem(data.answer, false);
+        formatted = tokens.join(".").toLowerCase();
+      }
+
+      nlp.addDocument(language, data.question, formatted);
+      nlp.addAnswer(language, formatted, data.answer);
     });
-    await manager.train();
+    await nlp.train();
+    nlp.save();
   } catch (error) {
     console.log(error);
     logger.error(error);
@@ -84,26 +130,33 @@ tensorCommands.answerTheQuestion = async (interaction) => {
     .trim()
     .toLowerCase();
 
-  console.info(`answerTheQuestion: ${question}`);
+  const language = interaction.options
+    .getString("language")
+    .trim()
+    .toLowerCase();
 
-  const response = await manager.process("es", question);
+  const response = await tensorCommands.answerMessage(question, language);
   await interaction
     .editReply({
-      content: response.answer || response.intent || "No answer",
+      content: response || "No answer",
       ephemeral: false,
     })
     .catch((error) => logger.error(error));
 };
 
 tensorCommands.answerMessage = async (message, language) => {
-  const response = await manager.process(language, message);
+  if (language === "es") {
+    message = normalizerEs.normalize(message);
+  } else if (language === "en") {
+    message = normalizerEn.normalize(message);
+  }
+
+  const response = await nlp.process(language, message);
+
+  console.log(response);
 
   if (response.answer) {
     return response.answer;
-  }
-
-  if (response.intent && response.intent != "None") {
-    return response.intent;
   }
 
   return null;
@@ -169,5 +222,4 @@ tensorCommands.addQuestion = async (interaction) => {
   }
 };
 
-loadModel();
 module.exports = tensorCommands;
