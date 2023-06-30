@@ -79,10 +79,10 @@ const addModel = async (trainingData) => {
       let formatted = data.answer;
 
       if (language === "es") {
-        const tokens = stemmerEs.tokenizeAndStem(data.answer, false);
+        const tokens = stemmerEs.tokenizeAndStem(data.question, false);
         formatted = tokens.join(".").toLowerCase();
       } else if (language === "en") {
-        const tokens = stemmerEn.tokenizeAndStem(data.answer, false);
+        const tokens = stemmerEn.tokenizeAndStem(data.question, false);
         formatted = tokens.join(".").toLowerCase();
       }
 
