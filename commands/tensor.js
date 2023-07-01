@@ -162,6 +162,60 @@ tensorCommands.answerMessage = async (message, language) => {
   return null;
 };
 
+tensorCommands.addQuestionFromModal = async (interaction) => {
+  await interaction.deferReply({ ephemeral: true });
+
+  const question = interaction.fields
+    .getTextInputValue("questionInput")
+    .trim()
+    .toLowerCase();
+  const answer = interaction.fields
+    .getTextInputValue("answerInput")
+    .trim()
+    .toLowerCase();
+
+  let result = false;
+
+  if (
+    interaction?.member?.id &&
+    interaction.member.id === process.env.DISCORD_OWNER_ID
+  ) {
+    result = await addAnswerToDatabase(
+      {
+        language: "en",
+        question: question,
+        answer: answer,
+      },
+      "questions"
+    );
+  } else {
+    result = await addAnswerToDatabase(
+      {
+        guilid: interaction.guildId,
+        language: "en",
+        question: question,
+        answer: answer,
+      },
+      "extraquestions"
+    );
+  }
+  if (result) {
+    await interaction
+      .editReply({
+        content: "Question added",
+        ephemeral: true,
+      })
+      .catch((error) => logger.error(error));
+  } else {
+    await interaction
+      .editReply({
+        content: "Error adding question",
+        ephemeral: true,
+      })
+      .catch((error) => logger.error(error));
+  }
+};
+
 tensorCommands.addQuestion = async (interaction) => {
   await interaction.deferReply({ ephemeral: true });
 
@@ -176,50 +230,64 @@ tensorCommands.addQuestion = async (interaction) => {
     .trim()
     .toLowerCase();
 
-  try {
-    await client.connect();
-    if (
-      interaction?.member?.id &&
-      interaction.member.id === process.env.DISCORD_OWNER_ID
-    ) {
-      const collection = client.db("dark").collection("questions");
-      await collection.insertOne({
+  let result = false;
+
+  if (
+    interaction?.member?.id &&
+    interaction.member.id === process.env.DISCORD_OWNER_ID
+  ) {
+    result = await addAnswerToDatabase(
+      {
         language: language,
         question: question,
         answer: answer,
-      });
-      await interaction
-        .editReply({
-          content: "Question added",
-          ephemeral: true,
-        })
-        .catch((error) => logger.error(error));
-    } else {
-      const collection = client.db("dark").collection("extraquestions");
-      await collection.insertOne({
+      },
+      "questions"
+    );
+  } else {
+    result = await addAnswerToDatabase(
+      {
         guilid: interaction.guildId,
         language: language,
         question: question,
         answer: answer,
-      });
-      await interaction
-        .editReply({
-          content: "Extra Question added",
-          ephemeral: true,
-        })
-        .catch((error) => logger.error(error));
-    }
-  } catch (err) {
-    console.log(err);
+      },
+      "extraquestions"
+    );
+  }
+
+  if (result) {
+    await interaction
+      .editReply({
+        content: "Question added",
+        ephemeral: true,
+      })
+      .catch((error) => logger.error(error));
+  } else {
     await interaction
       .editReply({
         content: "Error adding question",
         ephemeral: true,
       })
       .catch((error) => logger.error(error));
+  }
+};
+
+const addAnswerToDatabase = async (data, collectionName) => {
+  let success = false;
+  try {
+    await client.connect();
+    const collection = client.db("dark").collection(collectionName);
+    await collection.insertOne(data);
+    success = true;
+  } catch (err) {
+    console.log(err);
+    logger.error(err);
   } finally {
     await client.close();
   }
+
+  return success;
 };
 
 module.exports = tensorCommands;
