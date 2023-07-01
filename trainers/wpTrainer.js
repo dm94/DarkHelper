@@ -2,7 +2,7 @@ const controller = {};
 const items = [];
 
 const parsePageToItem = (page) => {
-  const title = page?.title?.rendered;
+  const title = page?.title?.rendered.trim();
   const content = page?.content?.rendered;
 
   if (!title || !content) {
@@ -11,12 +11,14 @@ const parsePageToItem = (page) => {
 
   let cleaned = content.replace(/(<([^>]+)>)/g, "");
   cleaned = cleaned.replace(/(?:https?|ftp):\/\/[\n\S]+/g, "");
-  cleaned = cleaned.replace("\n", "");
+  cleaned = cleaned.replace("\n", "").trim();
 
-  items.push({
-    title: String(title),
-    content: `${cleaned}`,
-  });
+  if (title.length > 0 || cleaned.length > 0) {
+    items.push({
+      title: String(title),
+      content: `${cleaned}`,
+    });
+  }
 };
 
 const fetchWikiPage = async (url) => {
