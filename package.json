@@ -18,6 +18,7 @@
   },
   "scripts": {
     "start": "node index.js",
+    "wikiTrainer": "node darkTrainer.js",
     "lint": "eslint --fix --ext .js,.jsx ."
   },
   "author": "Dm94Dani",
