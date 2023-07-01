@@ -12,6 +12,7 @@ const logger = require("./helpers/logger");
 const autocompleteController = require("./commands/interaction_types/autocomplete");
 const buttonController = require("./commands/interaction_types/button");
 const commandController = require("./commands/interaction_types/command");
+const modalController = require("./commands/interaction_types/modal");
 const tensorCommands = require("./commands/tensor");
 
 const client = new Client({
@@ -52,9 +53,13 @@ client.on("interactionCreate", async (interaction) => {
         await interaction.reply(
           genericCommands.getHelpContent(slashCommandsRegister.getCommands())
         );
+      } else if (interaction.commandName === "trainm") {
+        await modalController.router(interaction, client);
       } else {
         await commandController.router(interaction, client);
       }
+    } else if (interaction.isModalSubmit()) {
+      await modalController.router(interaction, client);
     }
   } catch (e) {
     logger.error(e);

@@ -22,7 +22,10 @@ controller.router = async (interaction) => {
         );
       }
     } else if (interaction.commandName === "reload") {
-      if (interaction?.member?.id && interaction.member.id === process.env.DISCORD_OWNER_ID) {
+      if (
+        interaction?.member?.id &&
+        interaction.member.id === process.env.DISCORD_OWNER_ID
+      ) {
         await tensorCommands.reloadModel(interaction);
       } else {
         await interaction.reply(
