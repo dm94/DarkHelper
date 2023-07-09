@@ -162,63 +162,7 @@ tensorCommands.answerMessage = async (message, language) => {
   return null;
 };
 
-tensorCommands.addQuestionFromModal = async (interaction) => {
-  await interaction.deferReply({ ephemeral: true });
-
-  const question = interaction.fields
-    .getTextInputValue("questionInput")
-    .trim()
-    .toLowerCase();
-  const answer = interaction.fields
-    .getTextInputValue("answerInput")
-    .trim()
-    .toLowerCase();
-
-  let result = false;
-
-  if (
-    interaction?.member?.id &&
-    interaction.member.id === process.env.DISCORD_OWNER_ID
-  ) {
-    result = await addAnswerToDatabase(
-      {
-        language: "en",
-        question: question,
-        answer: answer,
-      },
-      "questions"
-    );
-  } else {
-    result = await addAnswerToDatabase(
-      {
-        guilid: interaction.guildId,
-        language: "en",
-        question: question,
-        answer: answer,
-      },
-      "extraquestions"
-    );
-  }
-  if (result) {
-    await interaction
-      .editReply({
-        content: "Question added",
-        ephemeral: true,
-      })
-      .catch((error) => logger.error(error));
-  } else {
-    await interaction
-      .editReply({
-        content: "Error adding question",
-        ephemeral: true,
-      })
-      .catch((error) => logger.error(error));
-  }
-};
-
 tensorCommands.addQuestion = async (interaction) => {
-  await interaction.deferReply({ ephemeral: true });
-
   const question = interaction.options
     .getString("question")
     .trim()
@@ -229,6 +173,25 @@ tensorCommands.addQuestion = async (interaction) => {
     .getString("language")
     .trim()
     .toLowerCase();
+
+  addAnswer(interaction, language, question, answer);
+};
+
+tensorCommands.trainFromUsers = async (interaction, language) => {
+  const question = interaction.fields
+    .getTextInputValue("questionInput")
+    .trim()
+    .toLowerCase();
+  const answer = interaction.fields
+    .getTextInputValue("answerInput")
+    .trim()
+    .toLowerCase();
+
+  addAnswer(interaction, language, question, answer);
+};
+
+const addAnswer = async (interaction, language, question, answer) => {
+  await interaction.deferReply({ ephemeral: true });
 
   let result = false;
 
@@ -247,7 +210,7 @@ tensorCommands.addQuestion = async (interaction) => {
   } else {
     result = await addAnswerToDatabase(
       {
-        guilid: interaction.guildId,
+        guilid: interaction?.member?.id ?? "",
         language: language,
         question: question,
         answer: answer,

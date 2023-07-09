@@ -4,7 +4,11 @@ const {
   GatewayIntentBits,
   InteractionType,
   Partials,
+  ButtonBuilder,
+  ButtonStyle,
+  ActionRowBuilder,
 } = require("discord.js");
+
 const genericCommands = require("./commands/generic");
 const slashCommandsRegister = require("./slashCommandsRegister");
 const logger = require("./helpers/logger");
@@ -44,7 +48,11 @@ client.on("ready", () => {
 
 client.on("interactionCreate", async (interaction) => {
   try {
-    if (interaction.type === InteractionType.ApplicationCommandAutocomplete) {
+    if (interaction.customId.includes("editAnswer")) {
+      await modalController.router(interaction, client);
+    } else if (
+      interaction.type === InteractionType.ApplicationCommandAutocomplete
+    ) {
       await autocompleteController.router(interaction);
     } else if (interaction.isButton()) {
       await buttonController.router(interaction);
@@ -73,14 +81,23 @@ client.on("messageCreate", async (msg) => {
     }
 
     if (msg.content) {
-      const response = await tensorCommands.answerMessage(msg.content, "en");
+      const editButton = new ButtonBuilder()
+        .setCustomId("editAnswer")
+        .setLabel("Edit answer")
+        .setStyle(ButtonStyle.Danger);
+      let response = await tensorCommands.answerMessage(msg.content, "en");
+      if (!response) {
+        response = await tensorCommands.answerMessage(msg.content, "es");
+        editButton.setLabel("Corregir respuesta");
+        editButton.setCustomId("editAnswerEs");
+      }
+
       if (response) {
-        msg.reply(response);
-      } else {
-        const res = await tensorCommands.answerMessage(msg.content, "es");
-        if (res) {
-          msg.reply(res);
-        }
+        const row = new ActionRowBuilder().addComponents(editButton);
+        msg.reply({
+          content: response,
+          components: [row],
+        });
       }
     }
   } catch (e) {

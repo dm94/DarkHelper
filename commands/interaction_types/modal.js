@@ -11,10 +11,21 @@ const controller = {};
 
 controller.router = async (interaction) => {
   try {
-    if (interaction.commandName === "trainm") {
-      await controller.showTrainModal(interaction);
+    if (
+      interaction.commandName === "trainm" &&
+      interaction.member.id === process.env.DISCORD_OWNER_ID
+    ) {
+      await controller.showTrainModal(interaction, "trainmodal");
+    } else if (interaction.customId === "editAnswer") {
+      await controller.showTrainModal(interaction, "trainmodalen");
+    } else if (interaction.customId === "editAnswerEs") {
+      await controller.showTrainModal(interaction, "trainmodales");
     } else if (interaction.customId === "trainmodal") {
-      await tensorCommands.addQuestionFromModal(interaction);
+      await tensorCommands.trainFromUsers(interaction, "en");
+    } else if (interaction.customId === "trainmodalen") {
+      await tensorCommands.trainFromUsers(interaction, "en");
+    } else if (interaction.customId === "trainmodales") {
+      await tensorCommands.trainFromUsers(interaction, "es");
     }
   } catch (e) {
     console.log(e);
@@ -22,13 +33,9 @@ controller.router = async (interaction) => {
   }
 };
 
-controller.showTrainModal = async (interaction) => {
-  if (interaction.member.id !== process.env.DISCORD_OWNER_ID) {
-    return;
-  }
-
+controller.showTrainModal = async (interaction, customId = "trainmodal") => {
   const modal = new ModalBuilder()
-    .setCustomId("trainmodal")
+    .setCustomId(customId)
     .setTitle("Train Modal");
 
   const questionInput = new TextInputBuilder()
