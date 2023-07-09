@@ -83,7 +83,7 @@ client.on("messageCreate", async (msg) => {
     if (msg.content) {
       const editButton = new ButtonBuilder()
         .setCustomId("editAnswer")
-        .setLabel("Edit answer")
+        .setLabel("Fix answer")
         .setStyle(ButtonStyle.Danger);
       let response = await tensorCommands.answerMessage(msg.content, "en");
       if (!response) {
