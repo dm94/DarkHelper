@@ -48,7 +48,7 @@ client.on("ready", () => {
 
 client.on("interactionCreate", async (interaction) => {
   try {
-    if (interaction.customId.includes("editAnswer")) {
+    if (interaction?.customId && interaction.customId.includes("editAnswer")) {
       await modalController.router(interaction, client);
     } else if (
       interaction.type === InteractionType.ApplicationCommandAutocomplete
@@ -70,6 +70,8 @@ client.on("interactionCreate", async (interaction) => {
       await modalController.router(interaction, client);
     }
   } catch (e) {
+    console.log(e);
+
     logger.error(e);
   }
 });
