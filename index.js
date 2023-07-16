@@ -7,6 +7,7 @@ const {
   ButtonBuilder,
   ButtonStyle,
   ActionRowBuilder,
+  MessageType,
 } = require("discord.js");
 
 const genericCommands = require("./commands/generic");
@@ -78,7 +79,7 @@ client.on("interactionCreate", async (interaction) => {
 
 client.on("messageCreate", async (msg) => {
   try {
-    if (msg.author.bot) {
+    if (msg.author.bot || msg.type === MessageType.Reply) {
       return;
     }
 
@@ -87,13 +88,8 @@ client.on("messageCreate", async (msg) => {
         .setCustomId("editAnswer")
         .setLabel("Fix answer")
         .setStyle(ButtonStyle.Danger);
-      let response = await tensorCommands.answerMessage(msg.content, "en");
-      if (!response) {
-        response = await tensorCommands.answerMessage(msg.content, "es");
-        editButton.setLabel("Corregir respuesta");
-        editButton.setCustomId("editAnswerEs");
-      }
-
+      const language = await tensorCommands.detectLanguage(msg.content);
+      const response = await tensorCommands.getAnAnswer(msg.content, language);
       if (response) {
         const row = new ActionRowBuilder().addComponents(editButton);
         msg.reply({

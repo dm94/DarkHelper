@@ -3,6 +3,7 @@ const tensorCommands = {};
 const { NormalizerEs, StemmerEs, StopwordsEs } = require("@nlpjs/lang-es");
 const { NormalizerEn, StemmerEn, StopwordsEn } = require("@nlpjs/lang-en");
 const { dockStart } = require("@nlpjs/basic");
+const cld = require("cld");
 
 const { MongoClient, ServerApiVersion } = require("mongodb");
 const logger = require("../helpers/logger");
@@ -130,12 +131,9 @@ tensorCommands.answerTheQuestion = async (interaction) => {
     .trim()
     .toLowerCase();
 
-  const language = interaction.options
-    .getString("language")
-    .trim()
-    .toLowerCase();
+  const language = await tensorCommands.detectLanguage(question);
 
-  const response = await tensorCommands.answerMessage(question, language);
+  const response = await tensorCommands.getAnAnswer(question, language);
   await interaction
     .editReply({
       content: response || "No answer",
@@ -144,7 +142,7 @@ tensorCommands.answerTheQuestion = async (interaction) => {
     .catch((error) => logger.error(error));
 };
 
-tensorCommands.answerMessage = async (message, language) => {
+tensorCommands.getAnAnswer = async (message, language) => {
   if (language === "es") {
     message = normalizerEs.normalize(message);
   } else if (language === "en") {
@@ -152,8 +150,6 @@ tensorCommands.answerMessage = async (message, language) => {
   }
 
   const response = await nlp.process(language, message);
-
-  console.log(response);
 
   if (response.answer) {
     return response.answer;
@@ -177,7 +173,7 @@ tensorCommands.addQuestion = async (interaction) => {
   addAnswer(interaction, language, question, answer);
 };
 
-tensorCommands.trainFromUsers = async (interaction, language) => {
+tensorCommands.trainFromUsers = async (interaction) => {
   const question = interaction.fields
     .getTextInputValue("questionInput")
     .trim()
@@ -186,6 +182,8 @@ tensorCommands.trainFromUsers = async (interaction, language) => {
     .getTextInputValue("answerInput")
     .trim()
     .toLowerCase();
+
+  const language = await tensorCommands.detectLanguage(question);
 
   addAnswer(interaction, language, question, answer);
 };
@@ -251,6 +249,15 @@ const addAnswerToDatabase = async (data, collectionName) => {
   }
 
   return success;
+};
+
+tensorCommands.detectLanguage = async (text, fallBack = "en") => {
+  const response = await cld.detect(text);
+  if (response?.languages && response?.languages.length > 0) {
+    return response.languages[0].code;
+  }
+
+  return fallBack;
 };
 
 module.exports = tensorCommands;

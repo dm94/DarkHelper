@@ -12,20 +12,13 @@ const controller = {};
 controller.router = async (interaction) => {
   try {
     if (
-      interaction.commandName === "trainm" &&
-      interaction.member.id === process.env.DISCORD_OWNER_ID
+      (interaction.commandName === "trainm" &&
+        interaction.member.id === process.env.DISCORD_OWNER_ID) ||
+      interaction.customId === "editAnswer"
     ) {
       await controller.showTrainModal(interaction, "trainmodal");
-    } else if (interaction.customId === "editAnswer") {
-      await controller.showTrainModal(interaction, "trainmodalen");
-    } else if (interaction.customId === "editAnswerEs") {
-      await controller.showTrainModal(interaction, "trainmodales");
     } else if (interaction.customId === "trainmodal") {
-      await tensorCommands.trainFromUsers(interaction, "en");
-    } else if (interaction.customId === "trainmodalen") {
-      await tensorCommands.trainFromUsers(interaction, "en");
-    } else if (interaction.customId === "trainmodales") {
-      await tensorCommands.trainFromUsers(interaction, "es");
+      await tensorCommands.trainFromUsers(interaction);
     }
   } catch (e) {
     console.log(e);

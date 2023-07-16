@@ -9,15 +9,5 @@ module.exports = {
         .setName("question")
         .setDescription("The question")
         .setRequired(true)
-    )
-    .addStringOption((option) =>
-      option
-        .setName("language")
-        .setDescription("Language")
-        .addChoices(
-          { name: "Spanish", value: "es" },
-          { name: "English", value: "en" }
-        )
-        .setRequired(true)
     ),
 };
