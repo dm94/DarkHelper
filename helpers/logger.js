@@ -27,6 +27,7 @@ controller.info = (msg) => {
 };
 
 controller.error = (msg) => {
+  console.log(msg);
   logger.error(msg);
 };
 

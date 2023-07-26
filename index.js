@@ -79,7 +79,11 @@ client.on("interactionCreate", async (interaction) => {
 
 client.on("messageCreate", async (msg) => {
   try {
-    if (msg.author.bot || msg.type === MessageType.Reply) {
+    if (
+      msg.author.bot ||
+      msg.type === MessageType.Reply ||
+      msg.mentions.users.size > 0
+    ) {
       return;
     }
 
