@@ -197,7 +197,7 @@ const addAnswer = async (interaction, language, question, answer) => {
     interaction?.member?.id &&
     interaction.member.id === process.env.DISCORD_OWNER_ID
   ) {
-    result = await addAnswerToDatabase(
+    result = await tensorCommands.addAnswerToDatabase(
       {
         language: language,
         question: question,
@@ -206,7 +206,7 @@ const addAnswer = async (interaction, language, question, answer) => {
       "questions"
     );
   } else {
-    result = await addAnswerToDatabase(
+    result = await tensorCommands.addAnswerToDatabase(
       {
         guilid: interaction?.member?.id ?? "",
         language: language,
@@ -234,13 +234,14 @@ const addAnswer = async (interaction, language, question, answer) => {
   }
 };
 
-const addAnswerToDatabase = async (data, collectionName) => {
+tensorCommands.addAnswerToDatabase = async (data, collectionName) => {
   let success = false;
   try {
     await client.connect();
     const collection = client.db("dark").collection(collectionName);
     await collection.insertOne(data);
     success = true;
+    logger.info(`New data added to ${collectionName}`);
   } catch (err) {
     console.log(err);
     logger.error(err);
@@ -252,11 +253,15 @@ const addAnswerToDatabase = async (data, collectionName) => {
 };
 
 tensorCommands.detectLanguage = async (text, fallBack = "en") => {
-  const response = await cld.detect(text);
-  if (response?.languages && response?.languages.length > 0) {
-    return response.languages[0].code;
+  try {
+    const response = await cld.detect(text);
+    if (response?.languages && response?.languages.length > 0) {
+      return response.languages[0].code;
+    }
+  } catch (err) {
+    console.log(err);
+    logger.error(err);
   }
-
   return fallBack;
 };
 

@@ -79,12 +79,12 @@ client.on("interactionCreate", async (interaction) => {
 
 client.on("messageCreate", async (msg) => {
   try {
-    if (
-      msg.author.bot ||
-      msg.type === MessageType.Reply ||
-      msg.mentions.users.size > 0
-    ) {
+    if (msg.author.bot || msg.mentions.users.size > 0) {
       return;
+    }
+
+    if (msg.type === MessageType.Reply) {
+      selfTrain(msg);
     }
 
     if (msg.content) {
@@ -106,3 +106,34 @@ client.on("messageCreate", async (msg) => {
     logger.error(e);
   }
 });
+
+const selfTrain = async (msg) => {
+  const answer = msg.content;
+  const language = await tensorCommands.detectLanguage(answer);
+
+  if (!language) {
+    return;
+  }
+
+  const messageReferenceId = msg?.reference?.messageId;
+
+  if (!messageReferenceId) {
+    return;
+  }
+
+  const question = await msg.channel.messages.fetch(messageReferenceId);
+
+  if (!question) {
+    return;
+  }
+
+  await tensorCommands.addAnswerToDatabase(
+    {
+      guilid: msg?.author?.id ?? "",
+      language: language,
+      question: question.content,
+      answer: answer,
+    },
+    "extraquestions"
+  );
+};
