@@ -85,6 +85,7 @@ client.on("messageCreate", async (msg) => {
 
     if (msg.type === MessageType.Reply) {
       selfTrain(msg);
+      return;
     }
 
     if (msg.content) {
@@ -109,6 +110,11 @@ client.on("messageCreate", async (msg) => {
 
 const selfTrain = async (msg) => {
   const answer = msg.content;
+
+  if (!answer) {
+    return;
+  }
+
   const language = await tensorCommands.detectLanguage(answer);
 
   if (!language) {
