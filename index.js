@@ -115,19 +115,19 @@ const selfTrain = async (msg) => {
     return;
   }
 
-  const language = await tensorCommands.detectLanguage(answer);
-
-  if (!language) {
-    return;
-  }
+  const language = await tensorCommands.detectLanguage(answer, "en");
 
   const messageReferenceId = msg?.reference?.messageId;
+
+  console.log("messageReferenceId", messageReferenceId);
 
   if (!messageReferenceId) {
     return;
   }
 
   const question = await msg.channel.messages.fetch(messageReferenceId);
+
+  console.log("question", question);
 
   if (!question) {
     return;
