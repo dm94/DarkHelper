@@ -72,21 +72,22 @@ client.on("interactionCreate", async (interaction) => {
     }
   } catch (e) {
     console.log(e);
-
     logger.error(e);
   }
 });
 
 client.on("messageCreate", async (msg) => {
   try {
-    if (msg.author.bot || msg.mentions.users.size > 0 || !msg.content) {
+    if (msg.author.bot || !msg.content) {
       return;
     }
 
-    console.log(`Messasge: ${msg.content}`, msg.type);
-
     if (msg.type === MessageType.Reply) {
       selfTrain(msg);
+      return;
+    }
+
+    if (msg.mentions.users.size > 0) {
       return;
     }
 
@@ -119,15 +120,11 @@ const selfTrain = async (msg) => {
 
   const messageReferenceId = msg?.reference?.messageId;
 
-  console.log("messageReferenceId", messageReferenceId);
-
   if (!messageReferenceId) {
     return;
   }
 
   const question = await msg.channel.messages.fetch(messageReferenceId);
-
-  console.log("question", question);
 
   if (!question) {
     return;
