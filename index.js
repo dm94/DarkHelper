@@ -79,29 +79,29 @@ client.on("interactionCreate", async (interaction) => {
 
 client.on("messageCreate", async (msg) => {
   try {
-    if (msg.author.bot || msg.mentions.users.size > 0) {
+    if (msg.author.bot || msg.mentions.users.size > 0 || !msg.content) {
       return;
     }
+
+    console.log(`Messasge: ${msg.content}`, msg.type);
 
     if (msg.type === MessageType.Reply) {
       selfTrain(msg);
       return;
     }
 
-    if (msg.content) {
-      const editButton = new ButtonBuilder()
-        .setCustomId("editAnswer")
-        .setLabel("Fix answer")
-        .setStyle(ButtonStyle.Danger);
-      const language = await tensorCommands.detectLanguage(msg.content);
-      const response = await tensorCommands.getAnAnswer(msg.content, language);
-      if (response) {
-        const row = new ActionRowBuilder().addComponents(editButton);
-        msg.reply({
-          content: response,
-          components: [row],
-        });
-      }
+    const editButton = new ButtonBuilder()
+      .setCustomId("editAnswer")
+      .setLabel("Fix answer")
+      .setStyle(ButtonStyle.Danger);
+    const language = await tensorCommands.detectLanguage(msg.content);
+    const response = await tensorCommands.getAnAnswer(msg.content, language);
+    if (response) {
+      const row = new ActionRowBuilder().addComponents(editButton);
+      msg.reply({
+        content: response,
+        components: [row],
+      });
     }
   } catch (e) {
     logger.error(e);
