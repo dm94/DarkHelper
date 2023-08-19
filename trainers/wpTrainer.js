@@ -45,7 +45,7 @@ controller.getItemsFromWiki = async (baseUrl) => {
   do {
     console.log(
       new Date().toLocaleTimeString(),
-      `WP: ${baseUrl} | Page: ${page}`
+      `WP: ${baseUrl} | Page: ${baseUrl}/wp-json/wp/v2/pages?page=${page}`
     );
     hasMore = await fetchWikiPage(
       `${baseUrl}/wp-json/wp/v2/pages?page=${page}`
