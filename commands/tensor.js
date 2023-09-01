@@ -33,8 +33,20 @@ let nlp = null;
   const dock = await dockStart({
     settings: {
       nlp: {
-        forceNER: true,
-        languages: ["en", "es"],
+        languages: [
+          "en",
+          "es",
+          "tr",
+          "pt",
+          "pl",
+          "hu",
+          "it",
+          "fr",
+          "ro",
+          "de",
+          "bg",
+          "nl",
+        ],
       },
     },
     use: ["Nlp", "Basic", "LangEn", "LangEs"],
