@@ -38,19 +38,23 @@ const addItemsToDatabase = async (items) => {
   }
 };
 
-(async () => {
-  await clearDatabase();
-  const items = await wpTrainer.getItemsFromWiki("https://darkorbitwiki.com");
-  console.log("https://darkorbitwiki.com", items.length);
+const trainFromWP = async (domain, language = "en") => {
+  const items = await wpTrainer.getItemsFromWiki(domain);
+  console.log(domain, items.length);
 
   const databaseItems = items.map((item) => {
     return {
-      guilid: "https://darkorbitwiki.com",
-      language: "en",
+      guilid: domain,
+      language: language,
       question: item.title,
       answer: item.content,
     };
   });
 
   addItemsToDatabase(databaseItems);
+};
+
+(async () => {
+  await clearDatabase();
+  await trainFromWP("https://darkorbitwiki.com", "en");
 })();
