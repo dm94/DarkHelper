@@ -7,7 +7,7 @@ genericCommands.getInfoContent = () => {
   const message = new EmbedBuilder()
     .setColor("#008FFF")
     .setTitle(pjson.name + " v" + pjson.version)
-    .setURL("https://github.com/dm94/lastoasisbot")
+    .setURL(pjson.repository.url)
     .setAuthor({
       name: pjson.author,
       iconURL: "https://avatars.githubusercontent.com/u/7419213",
