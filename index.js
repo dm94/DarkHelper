@@ -91,6 +91,10 @@ client.on("messageCreate", async (msg) => {
       return;
     }
 
+    if (!msg.content.includes("?")) {
+      return;
+    }
+
     const editButton = new ButtonBuilder()
       .setCustomId("editAnswer")
       .setLabel("Fix answer")
