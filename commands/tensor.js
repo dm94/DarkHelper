@@ -27,26 +27,28 @@ stemmerEs.stopwords = new StopwordsEs();
 const stemmerEn = new StemmerEn();
 stemmerEn.stopwords = new StopwordsEn();
 
+const validLanguajes = [
+  "en",
+  "es",
+  "tr",
+  "pt",
+  "pl",
+  "hu",
+  "it",
+  "fr",
+  "ro",
+  "de",
+  "bg",
+  "nl",
+];
+
 let nlp = null;
 
 (async () => {
   const dock = await dockStart({
     settings: {
       nlp: {
-        languages: [
-          "en",
-          "es",
-          "tr",
-          "pt",
-          "pl",
-          "hu",
-          "it",
-          "fr",
-          "ro",
-          "de",
-          "bg",
-          "nl",
-        ],
+        languages: validLanguajes,
       },
     },
     use: ["Nlp", "Basic", "LangEn", "LangEs"],
@@ -85,6 +87,10 @@ const addModel = async (trainingData) => {
   try {
     trainingData.forEach((data) => {
       if (!data.question || !data.answer) {
+        return;
+      }
+
+      if (!validLanguajes.includes(data.language)) {
         return;
       }
 
@@ -203,6 +209,10 @@ tensorCommands.trainFromUsers = async (interaction) => {
 const addAnswer = async (interaction, language, question, answer) => {
   await interaction.deferReply({ ephemeral: true });
 
+  if (!validLanguajes.includes(language)) {
+    return;
+  }
+
   let result = false;
 
   if (
@@ -271,7 +281,6 @@ tensorCommands.detectLanguage = async (text, fallBack = "en") => {
       return response.languages[0].code;
     }
   } catch (err) {
-    console.log(err);
     logger.error(err);
   }
   return fallBack;

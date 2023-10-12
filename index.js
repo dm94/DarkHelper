@@ -8,6 +8,7 @@ const {
   ButtonStyle,
   ActionRowBuilder,
   MessageType,
+  ChannelType,
 } = require("discord.js");
 
 const genericCommands = require("./commands/generic");
@@ -76,7 +77,25 @@ client.on("interactionCreate", async (interaction) => {
   }
 });
 
+client.on("threadCreate", async (thread) => {
+  console.log(thread);
+  if (thread.type !== ChannelType.PublicThread) {
+    return;
+  }
+
+  try {
+    const message = await thread.fetchStarterMessage();
+    if (message) {
+      messageEvent(message, true);
+    }
+  } catch {}
+});
+
 client.on("messageCreate", async (msg) => {
+  messageEvent(msg);
+});
+
+const messageEvent = async (msg, forceResponse = false) => {
   try {
     if (msg.author.bot || !msg.content) {
       return;
@@ -91,14 +110,17 @@ client.on("messageCreate", async (msg) => {
       return;
     }
 
-    if (!msg.content.includes("?")) {
+    if (!msg.content.includes("?") && !forceResponse) {
       return;
     }
+
+    console.log("message", msg);
 
     const editButton = new ButtonBuilder()
       .setCustomId("editAnswer")
       .setLabel("Fix answer")
       .setStyle(ButtonStyle.Danger);
+
     const language = await tensorCommands.detectLanguage(msg.content);
     const response = await tensorCommands.getAnAnswer(msg.content, language);
     if (response) {
@@ -111,7 +133,7 @@ client.on("messageCreate", async (msg) => {
   } catch (e) {
     logger.error(e);
   }
-});
+};
 
 const selfTrain = async (msg) => {
   const answer = msg.content;
