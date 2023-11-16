@@ -209,7 +209,11 @@ tensorCommands.trainFromUsers = async (interaction) => {
 const addAnswer = async (interaction, language, question, answer) => {
   await interaction.deferReply({ ephemeral: true });
 
-  if (!validLanguajes.includes(language)) {
+  if (
+    !validLanguajes.includes(language) ||
+    question.includes("@") ||
+    answer.includes("@")
+  ) {
     return;
   }
 
