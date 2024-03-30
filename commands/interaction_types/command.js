@@ -32,6 +32,8 @@ controller.router = async (interaction) => {
           "You do not have permissions to use this command"
         );
       }
+    } else if (interaction.commandName === "donate") {
+      await interaction.reply("https://ko-fi.com/deeme");
     } else {
       await interaction.reply("I don't know this command");
     }
