@@ -1,18 +1,13 @@
 {
   "name": "dark-helper",
-  "version": "1.1.18",
+  "version": "2.0.0",
   "description": "Discord Bot with AI to help you with your plugin problems",
   "main": "index.js",
   "dependencies": {
-    "@nlpjs/basic": "^4.27.0",
-    "@nlpjs/lang-en": "^4.26.1",
-    "@nlpjs/lang-es": "^4.26.1",
-    "cld": "^2.9.0",
+    "axios": "^1.2.1",
     "discord.js": "^14.0.3",
     "dotenv": "^16.0.0",
-    "fs-extra": "^11.1.1",
     "mongodb": "^5.4.0",
-    "node-nlp": "^4.27.0",
     "winston": "^3.3.3"
   },
   "engines": {
@@ -24,9 +19,6 @@
   },
   "scripts": {
     "start": "node index.js",
-    "wikiTrainer": "node darkTrainer.js",
-    "aiTrainer": "node aiTrain.js",
-    "export": "node export.js",
     "lint": "eslint --fix --ext .js,.jsx ."
   },
   "author": "Dm94Dani",

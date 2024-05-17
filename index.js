@@ -88,7 +88,11 @@ client.on("threadCreate", async (thread) => {
     if (message) {
       messageEvent(message, true);
     }
-  } catch {}
+  } catch {
+    /**
+     * Nothing here
+     */
+  }
 });
 
 client.on("messageCreate", async (msg) => {
@@ -114,15 +118,12 @@ const messageEvent = async (msg, forceResponse = false) => {
       return;
     }
 
-    console.log("message", msg);
-
     const editButton = new ButtonBuilder()
       .setCustomId("editAnswer")
       .setLabel("Fix answer")
       .setStyle(ButtonStyle.Danger);
 
-    const language = await tensorCommands.detectLanguage(msg.content);
-    const response = await tensorCommands.getAnAnswer(msg.content, language);
+    const response = await tensorCommands.getAnAnswer(msg.content);
     if (response) {
       const row = new ActionRowBuilder().addComponents(editButton);
       msg.reply({
@@ -142,8 +143,6 @@ const selfTrain = async (msg) => {
     return;
   }
 
-  const language = await tensorCommands.detectLanguage(answer, "en");
-
   const messageReferenceId = msg?.reference?.messageId;
 
   if (!messageReferenceId) {
@@ -159,10 +158,9 @@ const selfTrain = async (msg) => {
   await tensorCommands.addAnswerToDatabase(
     {
       guilid: msg?.author?.id ?? "",
-      language: language,
+      collection: "extraquestions",
       question: question.content,
       answer: answer,
-    },
-    "extraquestions"
+    }
   );
 };
