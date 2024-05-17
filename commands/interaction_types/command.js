@@ -21,17 +21,6 @@ controller.router = async (interaction) => {
           "You do not have permissions to use this command"
         );
       }
-    } else if (interaction.commandName === "reload") {
-      if (
-        interaction?.member?.id &&
-        interaction.member.id === process.env.DISCORD_OWNER_ID
-      ) {
-        await tensorCommands.reloadModel(interaction);
-      } else {
-        await interaction.reply(
-          "You do not have permissions to use this command"
-        );
-      }
     } else if (interaction.commandName === "donate") {
       await interaction.reply("https://ko-fi.com/deeme");
     } else {
