@@ -24,10 +24,13 @@ controller.apiRequest = async (options) => {
     };
   }
 
+  logger.info(options);
+
   options.headers = {
     apiKey: process.env.APP_API_KEY,
     "Content-type": "charset=utf-8",
   };
+
   return Axios.request(options)
     .then((response) => {
       if (response.status == "400") {
@@ -58,7 +61,7 @@ controller.apiRequest = async (options) => {
       }
     })
     .catch((error) => {
-      logger.info(options);
+      logger.error(options.url);
       logger.error(error.message);
       if (error.response) {
         if (error.response.status == "400") {
