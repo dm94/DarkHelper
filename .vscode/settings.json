@@ -3,7 +3,7 @@
     "connectionId": "dm94",
     "projectKey": "dm94_lastoasisbot"
   },
-  "editor.defaultFormatter": "rvest.vs-code-prettier-eslint",
+  "editor.defaultFormatter": "biomejs.biome",
   "editor.formatOnPaste": false,
   "editor.formatOnType": false,
   "editor.formatOnSave": true,

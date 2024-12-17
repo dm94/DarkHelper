@@ -1,14 +1,7 @@
-
-const logger = require("../../helpers/logger");
-
 const controller = {};
 
-controller.router = async (interaction) => {
-  try {
-    //Button interactions
-  } catch (e) {
-    logger.error(e);
-  }
+controller.router = async (_interaction) => {
+  // Nothing
 };
 
 module.exports = controller;

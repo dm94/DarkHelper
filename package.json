@@ -1,6 +1,6 @@
 {
   "name": "dark-helper",
-  "version": "2.0.2",
+  "version": "2.1.0",
   "description": "Discord Bot with AI to help you with your plugin problems",
   "main": "index.js",
   "dependencies": {
@@ -18,12 +18,12 @@
   },
   "scripts": {
     "start": "node index.js",
-    "lint": "eslint --fix --ext .js,.jsx ."
+    "lint": "biome lint --write .",
+    "format": "biome format --write ."
   },
   "author": "Dm94Dani",
   "license": "MIT",
   "devDependencies": {
-    "eslint": "^8.33.0",
-    "prettier": "^3.4.1"
+    "@biomejs/biome": "1.9.4"
   }
 }

@@ -6,7 +6,7 @@ const pjson = require("../package.json");
 genericCommands.getInfoContent = () => {
   const message = new EmbedBuilder()
     .setColor("#008FFF")
-    .setTitle(pjson.name + " v" + pjson.version)
+    .setTitle(`${pjson.name} v${pjson.version}`)
     .setURL(pjson.repository.url)
     .setAuthor({
       name: pjson.author,
@@ -20,11 +20,11 @@ genericCommands.getInfoContent = () => {
 genericCommands.getHelpContent = (commands) => {
   let text = "Commands: \n \n";
 
-  commands.forEach((command) => {
+  for (const command of commands) {
     if (command.name && command.description) {
       text += `**/${command.name}** = ${command.description} \n`;
     }
-  });
+  }
 
   return text;
 };

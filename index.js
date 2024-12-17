@@ -39,10 +39,12 @@ client.login(process.env.DISCORD_TOKEN);
 client.on("ready", () => {
   if (process.env.APP_DEV) {
     logger.info("Dev Mode");
-    client.guilds.cache.forEach((guild) => {
+
+    for (const guild of client.guilds.cache) {
       slashCommandsRegister.registerSlashCommands(guild.id);
-    });
-    console.log("Servers:" + client.guilds.cache.size);
+    }
+
+    console.log(`Servers:${client.guilds.cache.size}`);
   } else {
     slashCommandsRegister.registerSlashCommandsGlobal();
   }
@@ -50,7 +52,7 @@ client.on("ready", () => {
 
 client.on("interactionCreate", async (interaction) => {
   try {
-    if (interaction?.customId && interaction.customId.includes("editAnswer")) {
+    if (interaction?.customId?.includes("editAnswer")) {
       await modalController.router(interaction, client);
     } else if (
       interaction.type === InteractionType.ApplicationCommandAutocomplete
@@ -61,7 +63,7 @@ client.on("interactionCreate", async (interaction) => {
     } else if (interaction.type === InteractionType.ApplicationCommand) {
       if (interaction.commandName === "help") {
         await interaction.reply(
-          genericCommands.getHelpContent(slashCommandsRegister.getCommands())
+          genericCommands.getHelpContent(slashCommandsRegister.getCommands()),
         );
       } else if (interaction.commandName === "trainm") {
         await modalController.router(interaction, client);
@@ -155,12 +157,10 @@ const selfTrain = async (msg) => {
     return;
   }
 
-  await tensorCommands.addAnswerToDatabase(
-    {
-      guilid: msg?.author?.id ?? "",
-      collection: "extraquestions",
-      question: question.content,
-      answer: answer,
-    }
-  );
+  await tensorCommands.addAnswerToDatabase({
+    guilid: msg?.author?.id ?? "",
+    collection: "extraquestions",
+    question: question.content,
+    answer: answer,
+  });
 };
