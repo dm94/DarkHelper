@@ -18,7 +18,7 @@ controller.router = async (interaction) => {
         await tensorCommands.addQuestion(interaction);
       } else {
         await interaction.reply(
-          "You do not have permissions to use this command"
+          "You do not have permissions to use this command",
         );
       }
     } else if (interaction.commandName === "donate") {

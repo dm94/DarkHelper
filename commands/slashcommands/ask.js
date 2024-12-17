@@ -8,6 +8,6 @@ module.exports = {
       option
         .setName("question")
         .setDescription("The question")
-        .setRequired(true)
+        .setRequired(true),
     ),
 };

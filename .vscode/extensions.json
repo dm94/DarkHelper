@@ -1,6 +1,3 @@
 {
-  "recommendations": [
-    "sonarsource.sonarlint-vscode",
-    "SonarSource.sonarlint-vscode"
-  ]
+  "recommendations": ["sonarsource.sonarlint-vscode"]
 }

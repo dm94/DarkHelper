@@ -1,6 +1,6 @@
 require("dotenv").config();
 const { REST, Routes } = require("discord.js");
-const fs = require("fs");
+const fs = require("node:fs");
 const controller = {};
 const logger = require("./helpers/logger");
 
@@ -12,7 +12,7 @@ const commandFiles = fs
 
 for (const file of commandFiles) {
   const command = require(`./commands/slashcommands/${file}`);
-  console.info("/" + command.data.name + " = " + command.data.description);
+  console.info(`/${command.data.name} = ${command.data.description}`);
   commands.push(command.data);
   commandsJson.push(command.data.toJSON());
 }
@@ -36,7 +36,7 @@ controller.registerSlashCommands = async (guildId) => {
         Routes.applicationGuildCommands(process.env.DISCORD_CLIENT_ID, guildId),
         {
           body: commandsJson,
-        }
+        },
       );
     }
   } catch (error) {

@@ -24,7 +24,7 @@ tensorCommands.answerTheQuestion = async (interaction) => {
 tensorCommands.getAnAnswer = async (message) => {
   const options = {
     method: "get",
-    url: process.env.APP_API_URL + "/ask",
+    url: `${process.env.APP_API_URL}/ask`,
     params: {
       question: message,
     },
@@ -66,10 +66,7 @@ tensorCommands.trainFromUsers = async (interaction) => {
 const addAnswer = async (interaction, question, answer) => {
   await interaction.deferReply({ ephemeral: true });
 
-  if (
-    question.includes("@") ||
-    answer.includes("@")
-  ) {
+  if (question.includes("@") || answer.includes("@")) {
     return;
   }
 
@@ -113,7 +110,7 @@ const addAnswer = async (interaction, question, answer) => {
 tensorCommands.addAnswerToDatabase = async (data) => {
   const options = {
     method: "post",
-    url: process.env.APP_API_URL + "/train",
+    url: `${process.env.APP_API_URL}/train`,
     data: data,
   };
 
