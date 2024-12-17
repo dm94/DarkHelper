@@ -36,7 +36,7 @@ tensorCommands.getAnAnswer = async (message) => {
     return response?.data?.reply;
   }
 
-  return null;
+  return undefined;
 };
 
 tensorCommands.addQuestion = async (interaction) => {
