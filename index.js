@@ -74,49 +74,43 @@ client.on("interactionCreate", async (interaction) => {
       await modalController.router(interaction, client);
     }
   } catch (e) {
-    console.log(e);
     logger.error(e);
   }
 });
 
 client.on("threadCreate", async (thread) => {
-  console.log(thread);
   if (thread.type !== ChannelType.PublicThread) {
     return;
   }
 
   try {
-    const message = await thread.fetchStarterMessage();
+    const message = await thread?.fetchStarterMessage();
     if (message) {
       messageEvent(message, true);
     }
   } catch {
-    /**
-     * Nothing here
-     */
+    logger.error("Error fetching thread");
   }
 });
 
-client.on("messageCreate", async (msg) => {
-  messageEvent(msg);
-});
+client.on("messageCreate", async (msg) => await messageEvent(msg));
 
 const messageEvent = async (msg, forceResponse = false) => {
   try {
-    if (msg.author.bot || !msg.content) {
+    if (msg?.author?.bot || !msg?.content) {
       return;
     }
 
-    if (msg.type === MessageType.Reply) {
+    if (msg?.type === MessageType.Reply) {
       selfTrain(msg);
       return;
     }
 
-    if (msg.mentions.users.size > 0) {
+    if (msg?.mentions?.users?.size > 0) {
       return;
     }
 
-    if (!msg.content.includes("?") && !forceResponse) {
+    if (!msg.content?.includes("?") && !forceResponse) {
       return;
     }
 
@@ -139,7 +133,7 @@ const messageEvent = async (msg, forceResponse = false) => {
 };
 
 const selfTrain = async (msg) => {
-  const answer = msg.content;
+  const answer = msg?.content;
 
   if (!answer) {
     return;
