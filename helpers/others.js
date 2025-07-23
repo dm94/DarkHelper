@@ -8,9 +8,33 @@ controller.sendChannelMessage = (channel, text) => {
 };
 
 controller.sendChannelData = (channel, data) => {
+  if (!controller.canSendMessages(channel)) {
+    logger.warn(`No permissions to send message in channel: ${channel.id}`);
+    return;
+  }
+
   channel.send(data).catch((error) => {
     logger.error(error);
   });
+};
+
+controller.canSendMessages = (channel) => {
+  try {
+    if (!channel || !channel.guild) {
+      return false;
+    }
+
+    const botMember = channel.guild.members.me;
+    if (!botMember) {
+      return false;
+    }
+
+    const permissions = channel.permissionsFor(botMember);
+    return permissions?.has("SendMessages");
+  } catch (error) {
+    logger.error("Error checking permissions:", error);
+    return false;
+  }
 };
 
 controller.apiRequest = async (options) => {
