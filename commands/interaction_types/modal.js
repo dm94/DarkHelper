@@ -21,34 +21,40 @@ controller.router = async (interaction) => {
       await tensorCommands.trainFromUsers(interaction);
     }
   } catch (e) {
-    console.log(e);
     logger.error(e);
   }
 };
 
 controller.showTrainModal = async (interaction, customId = "trainmodal") => {
-  const modal = new ModalBuilder()
-    .setCustomId(customId)
-    .setTitle("Train Modal");
+  try {
+    const modal = new ModalBuilder()
+      .setCustomId(customId)
+      .setTitle("Train Modal");
 
-  const questionInput = new TextInputBuilder()
-    .setCustomId("questionInput")
-    .setLabel("Question")
-    .setStyle(TextInputStyle.Short)
-    .setRequired(true);
+    const questionInput = new TextInputBuilder()
+      .setCustomId("questionInput")
+      .setLabel("Question")
+      .setStyle(TextInputStyle.Short)
+      .setRequired(true);
 
-  const answerInput = new TextInputBuilder()
-    .setCustomId("answerInput")
-    .setLabel("Answer")
-    .setStyle(TextInputStyle.Paragraph)
-    .setRequired(true);
+    const answerInput = new TextInputBuilder()
+      .setCustomId("answerInput")
+      .setLabel("Answer")
+      .setStyle(TextInputStyle.Paragraph)
+      .setRequired(true);
 
-  const firstActionRow = new ActionRowBuilder().addComponents(questionInput);
-  const secondActionRow = new ActionRowBuilder().addComponents(answerInput);
+    const firstActionRow = new ActionRowBuilder().addComponents(questionInput);
+    const secondActionRow = new ActionRowBuilder().addComponents(answerInput);
 
-  modal.addComponents(firstActionRow, secondActionRow);
+    modal.addComponents(firstActionRow, secondActionRow);
 
-  await interaction.showModal(modal);
+    await interaction.showModal(modal).catch((error) => {
+      logger.error("Error showing modal:", error);
+      throw error;
+    });
+  } catch (error) {
+    logger.error("Error in showTrainModal:", error);
+  }
 };
 
 controller.hasPermissions = async (interaction) => {

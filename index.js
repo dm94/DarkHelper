@@ -62,9 +62,13 @@ client.on("interactionCreate", async (interaction) => {
       await buttonController.router(interaction);
     } else if (interaction.type === InteractionType.ApplicationCommand) {
       if (interaction.commandName === "help") {
-        await interaction.reply(
-          genericCommands.getHelpContent(slashCommandsRegister.getCommands()),
-        );
+        await interaction
+          .reply(
+            genericCommands.getHelpContent(slashCommandsRegister.getCommands()),
+          )
+          .catch((error) => {
+            logger.error("Error replying to help command:", error);
+          });
       } else if (interaction.commandName === "trainm") {
         await modalController.router(interaction, client);
       } else {
@@ -74,7 +78,7 @@ client.on("interactionCreate", async (interaction) => {
       await modalController.router(interaction, client);
     }
   } catch (e) {
-    logger.error(e);
+    logger.error("Error in interactionCreate:", e);
   }
 });
 
@@ -122,10 +126,14 @@ const messageEvent = async (msg, forceResponse = false) => {
     const response = await tensorCommands.getAnAnswer(msg.content);
     if (response) {
       const row = new ActionRowBuilder().addComponents(editButton);
-      msg.reply({
-        content: response,
-        components: [row],
-      });
+      msg
+        .reply({
+          content: response,
+          components: [row],
+        })
+        .catch((error) => {
+          logger.error("Error sending reply:", error);
+        });
     }
   } catch (e) {
     logger.error(e);

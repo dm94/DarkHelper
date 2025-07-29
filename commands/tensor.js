@@ -4,21 +4,31 @@ const logger = require("../helpers/logger");
 const othersFunctions = require("../helpers/others");
 
 tensorCommands.answerTheQuestion = async (interaction) => {
-  await interaction.deferReply({ ephemeral: false });
+  try {
+    await interaction.deferReply({ ephemeral: false }).catch((error) => {
+      logger.error("Error deferring reply:", error);
+      throw error;
+    });
 
-  const question = interaction.options
-    .getString("question")
-    .trim()
-    .toLowerCase();
+    const question = interaction.options
+      .getString("question")
+      .trim()
+      .toLowerCase();
 
-  const response = await tensorCommands.getAnAnswer(question);
+    const response = await tensorCommands.getAnAnswer(question);
 
-  await interaction
-    .editReply({
-      content: response || "No answer",
-      ephemeral: false,
-    })
-    .catch((error) => logger.error(error));
+    await interaction
+      .editReply({
+        content: response || "No answer",
+        ephemeral: false,
+      })
+      .catch((error) => {
+        logger.error("Error editing reply:", error);
+        throw error;
+      });
+  } catch (error) {
+    logger.error("Error in answerTheQuestion:", error);
+  }
 };
 
 tensorCommands.getAnAnswer = async (message) => {
@@ -64,46 +74,61 @@ tensorCommands.trainFromUsers = async (interaction) => {
 };
 
 const addAnswer = async (interaction, question, answer) => {
-  await interaction.deferReply({ ephemeral: true });
-
-  if (question.includes("@") || answer.includes("@")) {
-    return;
-  }
-
-  let result = false;
-
-  if (
-    interaction?.member?.id &&
-    interaction.member.id === process.env.DISCORD_OWNER_ID
-  ) {
-    result = tensorCommands.addAnswerToDatabase({
-      question: question,
-      answer: answer,
-      collection: "questions",
+  try {
+    await interaction.deferReply({ ephemeral: true }).catch((error) => {
+      logger.error("Error deferring reply in addAnswer:", error);
+      throw error;
     });
-  } else {
-    result = tensorCommands.addAnswerToDatabase({
-      guilid: interaction?.member?.id ?? "",
-      question: question,
-      answer: answer,
-      collection: "extraquestions",
-    });
-  }
 
-  if (result) {
-    await interaction
-      .editReply({
-        content: "Question added",
-        ephemeral: true,
-      })
-      .catch((error) => logger.error(error));
-  } else {
-    await interaction
-      .editReply({
-        content: "Error adding question",
-        ephemeral: true,
-      })
-      .catch((error) => logger.error(error));
+    if (question.includes("@") || answer.includes("@")) {
+      await interaction
+        .editReply({
+          content: "Questions and answers cannot contain @ mentions",
+          ephemeral: true,
+        })
+        .catch((error) =>
+          logger.error("Error replying about @ mentions:", error),
+        );
+      return;
+    }
+
+    let result = false;
+
+    if (
+      interaction?.member?.id &&
+      interaction.member.id === process.env.DISCORD_OWNER_ID
+    ) {
+      result = await tensorCommands.addAnswerToDatabase({
+        question: question,
+        answer: answer,
+        collection: "questions",
+      });
+    } else {
+      result = await tensorCommands.addAnswerToDatabase({
+        guilid: interaction?.member?.id ?? "",
+        question: question,
+        answer: answer,
+        collection: "extraquestions",
+      });
+    }
+
+    if (result) {
+      await interaction
+        .editReply({
+          content: "Question added",
+          ephemeral: true,
+        })
+        .catch((error) => logger.error("Error replying success:", error));
+    } else {
+      await interaction
+        .editReply({
+          content: "Error adding question",
+          ephemeral: true,
+        })
+        .catch((error) => logger.error("Error replying failure:", error));
+    }
+  } catch (error) {
+    logger.error("Error in addAnswer:", error);
   }
 };
 
