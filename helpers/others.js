@@ -52,7 +52,7 @@ controller.apiRequest = async (options) => {
 
   options.headers = {
     apiKey: process.env.APP_API_KEY,
-    "Content-type": "charset=utf-8",
+    "Content-Type": "application/json",
   };
 
   return Axios.request(options)
